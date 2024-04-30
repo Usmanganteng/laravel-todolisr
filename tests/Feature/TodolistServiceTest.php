@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Services\TodolistService;
+use Database\Seeders\TodoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Testing\Assert;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Validator;
 
 class TodolistServiceTest extends TestCase
 {
@@ -17,6 +19,8 @@ class TodolistServiceTest extends TestCase
     protected function setUp():void
     {
         parent::setUp();
+
+        DB::delete("delete from todos");
 
         $this->todolistService = $this->app->make(TodolistService::class);
     }
@@ -28,30 +32,12 @@ class TodolistServiceTest extends TestCase
 
     public function testSaveTodo()
     {
-        $rules = [
-            'id' => 'min:2',
-            'todo' => 'min:2'
-        ];
-    
-        $data = [
-            'id' => '1',
-            'todo' => 'Mercys'
-        ];
-    
-        $validator = Validator::make($data, $rules);
-    
-        if ($validator->fails()) {
-            $errors = $validator->errors()->all();
-            $this->fail('Validation failed: ' . implode(', ', $errors));
-        }
-    
-        $this->todolistService->saveTodo("1", $data['todo']);
-    
-        $todolist = Session::get("todolist");
-    
+        $this->todolistService->saveTodo("1", "Farel");
+
+        $todolist = $this->todolistService->getTodolist();
         foreach ($todolist as $value){
             self::assertEquals("1", $value['id']);
-            self::assertEquals("Mercys", $value['todo']);
+            self::assertEquals("Farel", $value['todo']);
         }
     }
 
@@ -65,7 +51,7 @@ class TodolistServiceTest extends TestCase
         $expected = [
             [
                 "id" => "1",
-                "todo" => "Mercys"
+                "todo" => "Farel"
             ],
             [
                 "id" => "2",
@@ -73,14 +59,16 @@ class TodolistServiceTest extends TestCase
             ]
         ];
 
-        $this->todolistService->saveTodo("1", "Mercys");
+        $this->todolistService->saveTodo("1", "Farel");
         $this->todolistService->saveTodo("2", "Zeta");
 
-        self::assertEquals($expected, $this->todolistService->getTodolist());
+        Assert::assertArraySubset($expected, $this->todolistService->getTodolist());
     }
+
 
     public function testRemoveTodo()
     {
+        
         $this->todolistService->saveTodo("1", "Mercys");
         $this->todolistService->saveTodo("2", "Zeta");
 
