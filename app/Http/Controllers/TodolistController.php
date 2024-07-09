@@ -6,6 +6,8 @@ use App\Services\TodolistService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Todo;
 
 class TodolistController extends Controller
 {
@@ -14,39 +16,40 @@ class TodolistController extends Controller
 
     public function __construct(TodolistService $todolistService)
     {
+        $this->middleware('auth');
         $this->todolistService = $todolistService;
     }
 
     public function todoList(Request $request)
     {
-        $todolist = $this->todolistService->getTodolist();
-        return response()->view("todolist.todolist", [
+        $todolist = Todo::where('user_id', auth()->id())->get();
+        return view("todolist.todolist", [
             "title" => "Todolist",
             "todolist" => $todolist
         ]);
     }
 
+
     public function addTodo(Request $request)
     {
         $validatedData = $request->validate([
             'todo' => 'required|min:2',
-        ], [
-            'todo.required' => 'Todo is required.',
-            'todo.min' => 'Todo must be at least 2 characters long.',
         ]);
 
-        $todo = $validatedData['todo'];
-        $this->todolistService->saveTodo(uniqid(), $todo);
-        
-        return redirect()->action([TodolistController::class, 'todoList']);
+        Todo::create([
+            'todo' => $validatedData['todo'],
+            'user_id' => auth()->id()
+        ]);
+
+        return redirect()->route('todolist');
     }
 
 
 
-    public function removeTodo(Request $request, string $todoId): RedirectResponse
+    public function removeTodo(Request $request, $id)
     {
-        $this->todolistService->removeTodo($todoId);
-        return redirect()->action([TodolistController::class, 'todoList']);
+        $this->todolistService->removeTodo($id);
+        return redirect()->route('todolist'); 
     }
 
 }

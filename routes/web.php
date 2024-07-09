@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TodolistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,9 +29,9 @@ Route::controller(\App\Http\Controllers\UserController::class)->group(function (
     Route::post('/logout', 'doLogout')->middleware([\App\Http\Middleware\OnlyMemberMiddleware::class]);
 });
 
-Route::controller(\App\Http\Controllers\TodolistController::class)
-    ->middleware([\App\Http\Middleware\OnlyMemberMiddleware::class])->group(function () {
-        Route::get('/todolist', 'todoList');
-        Route::post('/todolist', 'addTodo');
-        Route::post('/todolist/{id}/delete', 'removeTodo');
-    });
+Route::middleware('auth')->group(function () {
+    Route::get('/todolist', [App\Http\Controllers\TodolistController::class, 'todoList'])->name('todolist');
+    Route::post('/todolist', [App\Http\Controllers\TodolistController::class, 'addTodo']);
+    Route::delete('/todolist/{id}', [TodolistController::class, 'removeTodo'])->name('removeTodo');
+
+});

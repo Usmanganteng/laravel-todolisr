@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Todo extends Model
 {
+    use HasFactory;
+
     protected $table = "todos";
     protected $primaryKey = "id";
     protected $keyType = "string";
     protected $fillable = [
         "id",
-        "todo"
+        "todo",
+        "user_id"
     ];
 
     public $timestamps = true;

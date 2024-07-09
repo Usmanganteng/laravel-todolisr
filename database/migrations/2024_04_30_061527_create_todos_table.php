@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('todos', function (Blueprint $table) {
-            $table->string("id")->nullable(false)->primary();
-            $table->string("todo", 500)->nullable(false);
+            $table->bigIncrements('id');
+            $table->string('todo', 500)->nullable(false);
+            $table->unsignedBigInteger('user_id');
             $table->timestamps();
         });
     }
