@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Todo;
+use App\Models\User;
 
 class TodolistController extends Controller
 {
@@ -23,9 +24,11 @@ class TodolistController extends Controller
     public function todoList(Request $request)
     {
         $todolist = Todo::where('user_id', auth()->id())->get();
+        $users = User::all();
         return view("todolist.todolist", [
             "title" => "Todolist",
-            "todolist" => $todolist
+            "todolist" => $todolist,
+            'users' => $users
         ]);
     }
 
