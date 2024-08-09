@@ -15,7 +15,8 @@ class Todo extends Model
     protected $fillable = [
         "id",
         "todo",
-        "user_id"
+        "user_id",
+        "due_date",
     ];
 
     public $timestamps = true;

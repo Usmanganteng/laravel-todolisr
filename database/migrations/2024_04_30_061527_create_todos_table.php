@@ -15,6 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->string('todo', 500)->nullable(false);
             $table->unsignedBigInteger('user_id');
+            $table->date('due_date'); // Add this line for the due date column
             $table->timestamps();
         });
     }
